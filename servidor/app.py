@@ -58,10 +58,10 @@ def valores_paginado():
       cerrarConexion()
       return f"Página inexistente: {pagina}", 400
 
-   cursor.execute("SELECT id, nombre, valor FROM valores LIMIT ? OFFSET ?;", (resultados_por_pag, descartar))
+   cursor.execute("SELECT id, nombre, valor, fecha_hora FROM valores LIMIT ? OFFSET ?;", (resultados_por_pag, descartar))
    lista = cursor.fetchall()
    cerrarConexion()
-   siguiente = None
+   siguiente = None 
    anterior = None
    if pagina > 1:
       anterior = url_for('valores_paginado', page=pagina-1, _external=True)
@@ -69,51 +69,22 @@ def valores_paginado():
       siguiente = url_for('valores_paginado', page=pagina+1, _external=True)
    info = { 'count': cant, 'pages': paginas, 'next': siguiente, 'prev': anterior }
    res = { 'info': info, 'results': lista }
-   return jsonify(res)
+   return res, 200
 
-# @app.route("/api/artista")
-# def artistas():
-#    args = request.args
-#    pagina = int(args.get('page', '1'))
-#    descartar = (pagina-1) * resultados_por_pag
-#    db = abrirConexion()
-#    cursor = db.cursor()
-#    cursor.execute("SELECT COUNT(*) AS cant FROM artists;")
-#    cant = cursor.fetchone()['cant']
-#    paginas = ceil(cant / resultados_por_pag)
-
-
-#    if pagina < 1 or pagina > paginas:
-#       return f"Página inexistente: {pagina}", 400
-
-
-#    cursor.execute(""" SELECT ArtistId, Name
-#                        FROM artists LIMIT ? OFFSET ?; """,
-#                        (resultados_por_pag,descartar))
-#    lista = cursor.fetchall()
-#    cerrarConexion()
-#    siguiente = None
-#    anterior = None
-#    if pagina > 1:
-#       anterior = url_for('artistas', page=pagina-1, _external=True)
-#    if pagina < paginas:
-#       siguiente = url_for('artistas', page=pagina+1, _external=True)
-#    info = { 'count' : cant, 'pages': paginas,
-#             'next' : siguiente, 'prev' : anterior }
-#    res = { 'info' : info, 'results' : lista}
-#    return jsonify(res)
-
-
-# @app.route("/api/artista/<int:id>")
-# def artista(id):
-#   db = abrirConexion()
-#   cursor = db.execute("""SELECT ArtistId, Name FROM artists
-#                           WHERE ArtistId = ?""", (id,))
-#   fila = cursor.fetchone()
-#   cerrarConexion()
-#   if fila == None:
-#      return f"Artista inexistente (id: {id})", 404
-#   res = {'ArtistId' : fila['ArtistId'],
-#          'Name': fila['Name'],
-#          'url': url_for('artista', id=id, _external=True)}
-#   return jsonify(res)
+@app.route("/api/valores/<int:id>")
+def valor(id):
+   db = abrirConexion()
+   cursor = db.execute("SELECT id, nombre, valor, fecha_hora FROM valores WHERE id = ?; ", (id,))
+   fila = cursor.fetchone()
+   cerrarConexion()
+   if fila is None:
+      return f"Valor inexistente (id: {id})", 404
+   
+   res = {
+      'id': fila['id'],
+      'nombre': fila['nombre'],
+      'valor': fila['valor'],
+      'fecha_hora': fila['fecha_hora'],
+      'url': url_for('valor', id=id, _external=True)
+   }
+   return res, 200
