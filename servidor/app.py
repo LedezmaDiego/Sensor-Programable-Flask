@@ -42,7 +42,34 @@ def sensor():
    cerrarConexion()
    return jsonify({'resultado': 'ok'}), 200
 
+# Ruta para ver los valores de los sensores en JSON con paginado
+@app.route("/api/valores_paginado")
+def valores_paginado():
+   args = request.args
+   pagina = int(args.get('page', '1'))
+   descartar = (pagina-1) * resultados_por_pag
+   db = abrirConexion()
+   cursor = db.cursor()
+   cursor.execute("SELECT COUNT(*) AS cant FROM valores;")
+   cant = cursor.fetchone()['cant']
+   paginas = ceil(cant / resultados_por_pag)
 
+   if pagina < 1 or pagina > paginas:
+      cerrarConexion()
+      return f"Página inexistente: {pagina}", 400
+
+   cursor.execute("SELECT id, nombre, valor FROM valores LIMIT ? OFFSET ?;", (resultados_por_pag, descartar))
+   lista = cursor.fetchall()
+   cerrarConexion()
+   siguiente = None
+   anterior = None
+   if pagina > 1:
+      anterior = url_for('valores_paginado', page=pagina-1, _external=True)
+   if pagina < paginas:
+      siguiente = url_for('valores_paginado', page=pagina+1, _external=True)
+   info = { 'count': cant, 'pages': paginas, 'next': siguiente, 'prev': anterior }
+   res = { 'info': info, 'results': lista }
+   return jsonify(res)
 
 # @app.route("/api/artista")
 # def artistas():
