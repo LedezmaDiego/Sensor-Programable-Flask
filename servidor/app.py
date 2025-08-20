@@ -40,4 +40,53 @@ def sensor():
    db.execute("INSERT INTO valores (nombre, valor) VALUES (?, ?);", (nombre, valor))
    db.commit()
    cerrarConexion()
-   return "OK", 200
+   return jsonify({'resultado': 'ok'}), 200
+
+
+
+# @app.route("/api/artista")
+# def artistas():
+#    args = request.args
+#    pagina = int(args.get('page', '1'))
+#    descartar = (pagina-1) * resultados_por_pag
+#    db = abrirConexion()
+#    cursor = db.cursor()
+#    cursor.execute("SELECT COUNT(*) AS cant FROM artists;")
+#    cant = cursor.fetchone()['cant']
+#    paginas = ceil(cant / resultados_por_pag)
+
+
+#    if pagina < 1 or pagina > paginas:
+#       return f"Página inexistente: {pagina}", 400
+
+
+#    cursor.execute(""" SELECT ArtistId, Name
+#                        FROM artists LIMIT ? OFFSET ?; """,
+#                        (resultados_por_pag,descartar))
+#    lista = cursor.fetchall()
+#    cerrarConexion()
+#    siguiente = None
+#    anterior = None
+#    if pagina > 1:
+#       anterior = url_for('artistas', page=pagina-1, _external=True)
+#    if pagina < paginas:
+#       siguiente = url_for('artistas', page=pagina+1, _external=True)
+#    info = { 'count' : cant, 'pages': paginas,
+#             'next' : siguiente, 'prev' : anterior }
+#    res = { 'info' : info, 'results' : lista}
+#    return jsonify(res)
+
+
+# @app.route("/api/artista/<int:id>")
+# def artista(id):
+#   db = abrirConexion()
+#   cursor = db.execute("""SELECT ArtistId, Name FROM artists
+#                           WHERE ArtistId = ?""", (id,))
+#   fila = cursor.fetchone()
+#   cerrarConexion()
+#   if fila == None:
+#      return f"Artista inexistente (id: {id})", 404
+#   res = {'ArtistId' : fila['ArtistId'],
+#          'Name': fila['Name'],
+#          'url': url_for('artista', id=id, _external=True)}
+#   return jsonify(res)
