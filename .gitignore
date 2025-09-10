@@ -4,7 +4,7 @@
 __pycache__/
 
 instance/
-node_modules
+node_modules/
 .pytest_cache/
 .coverage
 htmlcov/
@@ -14,3 +14,5 @@ build/
 *.egg-info/
 
 sensor_valores.sqlite
+
+.env
